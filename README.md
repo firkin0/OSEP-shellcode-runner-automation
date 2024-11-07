@@ -1,2 +1,2 @@
-# OSEP-shellcode-runner-automation
-Tool created during OSEP course. Made to automate the process of shellcode runners creation. 
+# OSEP-shellcode-runner-automation 
+A tool developed during the OSEP course, designed to automate the creation of shellcode runners.
