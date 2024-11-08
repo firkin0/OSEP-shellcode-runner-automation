@@ -1,10 +1,10 @@
- #!/bin/python3
+#!/bin/python3
 import subprocess
 import socket
 import random
 from colorama import init
 from termcolor import colored
- 
+
 init()
 
 def read_file(f):

@@ -1,4 +1,4 @@
- #!/bin/python3
+#!/bin/python3
 import subprocess
 import socket
 import random
@@ -38,8 +38,8 @@ def generateHtaJScriptPayload(arch):
         payload = read_file(JScriptFile)
 
     except:
-         print(colored(f"    [-] JScript File not found in /mnt/tools/met.js !",'red'))
-         return
+        print(colored(f"    [-] JScript File not found in /mnt/tools/met.js !",'red'))
+        return
 
     template_name = "js_hta.hta"
     template = read_file("templates/" + template_name)

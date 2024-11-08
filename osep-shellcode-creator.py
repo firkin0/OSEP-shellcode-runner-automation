@@ -247,7 +247,7 @@ def startApache():
 ######################
 def main():
 
-    print("Hello World!")
+    print("Automation Tool")
 
     # update config file
     getData()
@@ -278,7 +278,6 @@ def main():
 
             # create output directory if not exist
             if (not os.path.exists(os.getcwd()+"/output")):
-                print("[+] Creating output directory")
                 os.mkdir(os.getcwd()+"/output")
 
             output_dir = f"/output/{arch}"
@@ -314,7 +313,6 @@ def main():
                         
                     # create output process migration directory if not exist
                     if (not os.path.exists(os.getcwd()+"/output/process_migration")):
-                        print("[+] Creating output process migration directory")
                         os.mkdir(os.getcwd()+"/output/process_migration")
                     
                     output_dir = f"/output/process_migration/{arch}"
@@ -334,7 +332,6 @@ def main():
                         
                     # create output process migration directory if not exist
                     if (not os.path.exists(os.getcwd()+"/output/applocker")):
-                        print("[+] Creating output applocker directory")
                         os.mkdir(os.getcwd()+"/output/applocker")
                     
                     output_dir = f"/output/applocker/{arch}"

