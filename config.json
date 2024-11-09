@@ -5,8 +5,8 @@
     "enc_technique": "xor",
     "lhost": "192.168.45.158",
     "lport": 443,
-    "msf_payload": "meterpreter/reverse_https",
+    "msf_payload": "shell/reverse_tcp",
     "payload_type": [
-        "applocker"
+        "initial"
     ]
 }
